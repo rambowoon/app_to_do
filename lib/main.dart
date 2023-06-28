@@ -1,40 +1,69 @@
+import 'package:app_to_do/scaffold_with_nav_bar.dart';
+import 'setting/adapters/setting_hive.dart';
+import 'setting/providers/setting_provider.dart';
+import 'setting_language.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive_flutter/adapters.dart';
 
-import 'screens/home_screen.dart';
+import 'app_init.dart';
+import 'app_theme.dart';
+import 'home/adapters/todo_hive.dart';
+import 'home/home_screen.dart';
 
-void main() {
-  runApp(
-    ProviderScope(
-      child: MyApp(),
-    ),
-  );
+Future main() async{
+  await Hive.initFlutter();
+  Hive.registerAdapter(SettingHiveAdapter());
+  Hive.registerAdapter(TodoHiveAdapter());
+  await Hive.openBox<SettingHive>('setting');
+  await Hive.openBox<TodoHive>('todo');
+  await AppInit.settup();
+  runApp(ProviderScope(child: MyApp()));
 }
 
-final GoRouter _router = GoRouter(
-  routes: <RouteBase>[
-    GoRoute(
-      path: '/',
-      builder: (BuildContext context, GoRouterState state) {
-        return HomeScreen();
-      }
-    ),
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final _shellNavigatorKey = GlobalKey<NavigatorState>();
+
+final _router = GoRouter(
+  initialLocation: '/',
+  navigatorKey: _rootNavigatorKey,
+  routes: [
+    ShellRoute(
+      navigatorKey: _shellNavigatorKey,
+      builder: (context, state, child) {
+        return ScaffoldWithNavBar(child: child);
+      },
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) {
+            return HomeScreen();
+          },
+        )
+      ],
+    )
   ],
 );
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends ConsumerWidget {
+  const MyApp({
+    Key? key,
+  }) : super(key: key);
 
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(settingProvider);
+    final languageMode = ref.watch(languageProvider);
     return MaterialApp.router(
+      title: 'ToDo Tasks',
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: themeMode,
+      localizationsDelegates: NDSharedLanguage().localeDelegate,
+      supportedLocales: NDSharedLanguage().supportedLocales,
+      locale: languageMode,
       routerConfig: _router,
     );
   }
