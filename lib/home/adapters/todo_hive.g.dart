@@ -17,7 +17,7 @@ class TodoHiveAdapter extends TypeAdapter<TodoHive> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return TodoHive(
-      taskID: fields[0] as int?,
+      taskID: fields[0] as String?,
       taskName: fields[1] as String?,
       taskNote: fields[2] as String?,
       endTime: fields[3] as int?,

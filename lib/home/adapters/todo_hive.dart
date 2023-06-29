@@ -5,7 +5,7 @@ part 'todo_hive.g.dart';
 @HiveType(typeId: 2)
 class TodoHive extends HiveObject {
   @HiveField(0)
-  int? taskID;
+  String? taskID;
 
   @HiveField(1)
   String? taskName;
