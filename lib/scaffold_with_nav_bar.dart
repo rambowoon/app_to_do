@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import 'home/adapters/todo_hive.dart';
@@ -65,8 +66,8 @@ class CustomBottomNavBar extends ConsumerWidget {
             ),
             IconButton(
               color: Colors.white,
-              tooltip: 'Favorite',
-              icon: const Icon(Icons.favorite),
+              tooltip: 'Ưu tiên',
+              icon: const Icon(Icons.star),
               onPressed: () {},
             ),
           ],
@@ -79,15 +80,15 @@ class CustomBottomNavBar extends ConsumerWidget {
 void _showBottomSheet(BuildContext context, WidgetRef ref) {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
-  DateTime? selectedDate;
-  TimeOfDay? selectedTime;
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = TimeOfDay.now();
 
   Future<void> _selectDate() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2021),
-      lastDate: DateTime(2025),
+      initialDate: selectedDate,
+      firstDate: DateTime(selectedDate.year),
+      lastDate: DateTime(2050),
     );
 
     if (pickedDate != null) {
@@ -98,7 +99,7 @@ void _showBottomSheet(BuildContext context, WidgetRef ref) {
   Future<void> _selectTime() async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: selectedTime,
     );
 
     if (pickedTime != null) {
@@ -167,7 +168,7 @@ void _showBottomSheet(BuildContext context, WidgetRef ref) {
                 ),
                 TextButton(
                   onPressed: () {
-                    _addToDoTask(nameController.text, noteController.text, ref);
+                    _addToDoTask(nameController.text, noteController.text, selectedDate, selectedTime,  ref);
                     Navigator.pop(context);
                   },
                   child: Text('Thêm'),
@@ -183,15 +184,28 @@ void _showBottomSheet(BuildContext context, WidgetRef ref) {
 
 
 
-void _addToDoTask(String name, String note, WidgetRef ref) async {
+void _addToDoTask(String name, String note, DateTime date, TimeOfDay time, WidgetRef ref) async {
   var uuid = Uuid();
   var taskID = uuid.v4();
-  print(taskID);
+
+  DateTime combinedDateTime = DateTime(
+    date.year,
+    date.month,
+    date.day,
+    time.hour,
+    time.minute,
+  );
+  int dateTimePick = combinedDateTime.millisecondsSinceEpoch;
+  int dateTimeNow = DateTime.now().millisecondsSinceEpoch;
+  if(dateTimePick < dateTimeNow){
+    dateTimePick = 0;
+  }
+
   TodoHive todo = TodoHive();
   todo.taskID = taskID;
   todo.taskName = name;
   todo.taskNote = note;
-  todo.endTime = 1688049190;
+  todo.endTime = dateTimePick;
   todo.isCompleted = false;
 
   await ref.read(todoNotifierProvider.notifier).addTodo(todo);
