@@ -36,4 +36,18 @@ class TodoNotifier extends AsyncNotifier<List<TodoHive>>{
       return _getTodo();
     });
   }
+
+  Future<void> prioritizeTodo(String taskID, bool isPrioritize) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final List<TodoHive> todoItems = _todoBox.values.toList();
+
+      final existingItemIndex = todoItems.indexWhere((cartItem) => cartItem.taskID == taskID);
+      if (existingItemIndex != -1) {
+        final existingItem = todoItems[existingItemIndex];
+        _todoBox.putAt(existingItem.key, existingItem.copyWith(isPrioritize: isPrioritize));
+      }
+      return _getTodo();
+    });
+  }
 }

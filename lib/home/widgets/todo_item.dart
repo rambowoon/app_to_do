@@ -23,9 +23,14 @@ class ToDoItem extends ConsumerWidget {
           ),
           child: Row(
             children: [
-              Icon(
-                todo.isCompleted ?? false ? Icons.star : Icons.star_border,
-                color: kCompleteColor,
+              IconButton(
+                onPressed: (){
+                  ref.read(todoNotifierProvider.notifier).prioritizeTodo(todo.taskID!, !todo.isPrioritize!);
+                },
+                icon: Icon(
+                  todo.isPrioritize ?? false ? Icons.star : Icons.star_border,
+                  color: kCompleteColor,
+                ),
               ),
               SizedBox(width: 10),
               Expanded(

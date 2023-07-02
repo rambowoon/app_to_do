@@ -206,6 +206,7 @@ void _addToDoTask(String name, String note, DateTime date, TimeOfDay time, Widge
   todo.taskName = name;
   todo.taskNote = note;
   todo.endTime = dateTimePick;
+  todo.isPrioritize = false;
   todo.isCompleted = false;
 
   await ref.read(todoNotifierProvider.notifier).addTodo(todo);

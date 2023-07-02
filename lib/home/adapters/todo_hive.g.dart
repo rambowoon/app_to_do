@@ -21,14 +21,15 @@ class TodoHiveAdapter extends TypeAdapter<TodoHive> {
       taskName: fields[1] as String?,
       taskNote: fields[2] as String?,
       endTime: fields[3] as int?,
-      isCompleted: fields[4] as bool?,
+      isPrioritize: fields[4] as bool?,
+      isCompleted: fields[5] as bool?,
     );
   }
 
   @override
   void write(BinaryWriter writer, TodoHive obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.taskID)
       ..writeByte(1)
@@ -38,6 +39,8 @@ class TodoHiveAdapter extends TypeAdapter<TodoHive> {
       ..writeByte(3)
       ..write(obj.endTime)
       ..writeByte(4)
+      ..write(obj.isPrioritize)
+      ..writeByte(5)
       ..write(obj.isCompleted);
   }
 

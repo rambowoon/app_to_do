@@ -13,30 +13,41 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    return DefaultTabController(
+      initialIndex: 1,
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.menu),
+            onPressed: () {},
+          ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {},
+            )
+          ],
+          bottom: const TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.star_border)),
+              Tab(text: 'Việc làm',),
+              Tab(icon: Icon(Icons.directions_bike)),
+            ],
+          )
+        ),
+        body: TabBarView(
+          children: [
+            Icon(Icons.directions_transit),
+            ListTodo(),
+            Icon(Icons.directions_bike),
+          ],
+        ),
 
-
-    return Scaffold(
-        appBar: _buildAppBar(),
-        body: ListTodo()
+      ),
     );
   }
-}
-
-AppBar _buildAppBar() {
-  return AppBar(
-    backgroundColor: kBackgroundColor,
-    elevation: 0,
-    leading: IconButton(
-      icon: Icon(Icons.menu),
-      onPressed: () {},
-    ),
-    actions: [
-      IconButton(
-        icon: Icon(Icons.search),
-        onPressed: () {},
-      )
-    ],
-  );
 }
 
 class ListTodo extends ConsumerWidget {

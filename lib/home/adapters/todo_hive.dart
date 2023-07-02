@@ -17,7 +17,22 @@ class TodoHive extends HiveObject {
   int? endTime;
 
   @HiveField(4)
+  bool? isPrioritize;
+
+  @HiveField(5)
   bool? isCompleted;
 
-  TodoHive({this.taskID, this.taskName, this.taskNote, this.endTime, this.isCompleted});
+
+  TodoHive({this.taskID, this.taskName, this.taskNote, this.endTime, this.isPrioritize, this.isCompleted});
+
+  TodoHive copyWith({String? taskID, String? taskName, String? taskNote, int? endTime, bool? isPrioritize, bool? isCompleted}){
+    return TodoHive(
+      taskID: taskID ?? this.taskID,
+      taskName: taskName ?? this.taskName,
+      taskNote: taskNote ?? this.taskNote,
+      endTime: endTime ?? this.endTime,
+      isPrioritize: isPrioritize ?? this.isPrioritize,
+      isCompleted: isCompleted ?? this.isCompleted
+    );
+  }
 }
