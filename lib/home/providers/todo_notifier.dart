@@ -1,3 +1,4 @@
+import 'package:app_to_do/home/providers/todo_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
 
@@ -49,5 +50,25 @@ class TodoNotifier extends AsyncNotifier<List<TodoHive>>{
       }
       return _getTodo();
     });
+  }
+}
+
+class PrioritizeTodoNotifier extends AsyncNotifier<List<TodoHive>> {
+  @override
+  Future<List<TodoHive>> build() async {
+    return _getPrioritizeTodo();
+  }
+
+  Future<List<TodoHive>> _getPrioritizeTodo() async {
+    final List<TodoHive> listPrioritizeTodo = [];
+    final listTodo = ref.watch(todoNotifierProvider).value;
+    if(listTodo != null) {
+      for (var item in listTodo) {
+        if (item.isPrioritize == true) {
+          listPrioritizeTodo.add(item);
+        }
+      }
+    }
+    return await listPrioritizeTodo;
   }
 }

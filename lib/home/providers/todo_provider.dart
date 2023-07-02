@@ -6,3 +6,7 @@ import '../adapters/todo_hive.dart';
 final todoNotifierProvider = AsyncNotifierProvider<TodoNotifier, List<TodoHive>>((){
   return TodoNotifier();
 });
+
+final todoPrioritizeNotifierProvider = AsyncNotifierProvider<PrioritizeTodoNotifier, List<TodoHive>>((){
+  return PrioritizeTodoNotifier();
+});

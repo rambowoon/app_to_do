@@ -39,13 +39,36 @@ class HomeScreen extends ConsumerWidget {
         ),
         body: TabBarView(
           children: [
-            Icon(Icons.directions_transit),
+            ListPrioritizeTodo(),
             ListTodo(),
             Icon(Icons.directions_bike),
           ],
         ),
 
       ),
+    );
+  }
+}
+
+class ListPrioritizeTodo extends ConsumerWidget {
+  const ListPrioritizeTodo({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final todoList = ref.watch(todoPrioritizeNotifierProvider);
+
+    return todoList.when(
+        data: (todo) => ListView.builder(
+            shrinkWrap: true,
+            itemCount: todo?.length,
+            padding: EdgeInsets.only(top: 20, bottom: 20, left: 10, right: 10),
+            itemBuilder: (BuildContext context, int index) {
+              final TodoHive todoItem = todo![index];
+              return ToDoItem(todo: todoItem);
+            }
+        ),
+        error: (err, stack) => Text('Lỗi rồi đại vương ơi'),
+        loading: () => Center(child: CircularProgressIndicator.adaptive())
     );
   }
 }
