@@ -29,7 +29,7 @@ class TodoNotifier extends AsyncNotifier<List<TodoHive>>{
     state = await AsyncValue.guard(() async {
       final List<TodoHive> todoItems = _todoBox.values.toList();
 
-      final existingItemIndex = todoItems.indexWhere((cartItem) => cartItem.taskID == taskID);
+      final existingItemIndex = todoItems.indexWhere((taskItem) => taskItem.taskID == taskID);
       if (existingItemIndex != -1) {
         final existingItem = todoItems[existingItemIndex];
         _todoBox.delete(existingItem.key);
@@ -43,7 +43,7 @@ class TodoNotifier extends AsyncNotifier<List<TodoHive>>{
     state = await AsyncValue.guard(() async {
       final List<TodoHive> todoItems = _todoBox.values.toList();
 
-      final existingItemIndex = todoItems.indexWhere((cartItem) => cartItem.taskID == taskID);
+      final existingItemIndex = todoItems.indexWhere((taskItem) => taskItem.taskID == taskID);
       if (existingItemIndex != -1) {
         final existingItem = todoItems[existingItemIndex];
         _todoBox.putAt(existingItem.key, existingItem.copyWith(isPrioritize: isPrioritize));

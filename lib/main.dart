@@ -1,4 +1,5 @@
 import 'package:app_to_do/scaffold_with_nav_bar.dart';
+import 'home/adapters/list_todo_hive.dart';
 import 'setting/adapters/setting_hive.dart';
 import 'setting/providers/setting_provider.dart';
 import 'setting_language.dart';
@@ -16,8 +17,10 @@ Future main() async{
   await Hive.initFlutter();
   Hive.registerAdapter(SettingHiveAdapter());
   Hive.registerAdapter(TodoHiveAdapter());
+  Hive.registerAdapter(ListTodoHiveAdapter());
   await Hive.openBox<SettingHive>('setting');
   await Hive.openBox<TodoHive>('todo');
+  await Hive.openBox<ListTodoHive>('list_todo');
   await AppInit.settup();
   runApp(ProviderScope(child: MyApp()));
 }

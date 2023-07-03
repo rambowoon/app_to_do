@@ -182,8 +182,6 @@ void _showBottomSheet(BuildContext context, WidgetRef ref) {
   );
 }
 
-
-
 void _addToDoTask(String name, String note, DateTime date, TimeOfDay time, WidgetRef ref) async {
   var uuid = Uuid();
   var taskID = uuid.v4();
@@ -208,6 +206,7 @@ void _addToDoTask(String name, String note, DateTime date, TimeOfDay time, Widge
   todo.endTime = dateTimePick;
   todo.isPrioritize = false;
   todo.isCompleted = false;
+  todo.listTaskID = taskID;
 
   await ref.read(todoNotifierProvider.notifier).addTodo(todo);
 }

@@ -1,10 +1,13 @@
+import 'package:uuid/uuid.dart';
+
+import 'adapters/list_todo_hive.dart';
+import 'providers/list_todo_provider.dart';
 import 'providers/todo_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'adapters/todo_hive.dart';
 import 'widgets/todo_item.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../constants.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({
@@ -13,9 +16,21 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final listTodoProvider = ref.watch(listTodoNotifierProvider);
+    List<ListTodoHive> listTab = [
+      ListTodoHive(listTaskID: 'prioritize', listTaskName: ''),
+      ListTodoHive(listTaskID: 'mytask', listTaskName: 'Việc cần làm của tôi')
+    ];
+    listTodoProvider.when(
+        data: (todo) => {
+          listTab.addAll(todo)
+        },
+        error: (err, stack) => Text('Lỗi rồi đại vương ơi'),
+        loading: () => Center(child: CircularProgressIndicator.adaptive())
+    );
     return DefaultTabController(
       initialIndex: 1,
-      length: 3,
+      length: listTab.length + 1,
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -29,22 +44,39 @@ class HomeScreen extends ConsumerWidget {
               onPressed: () {},
             )
           ],
-          bottom: const TabBar(
+          bottom: TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.star_border)),
-              Tab(text: 'Việc làm',),
-              Tab(icon: Icon(Icons.directions_bike)),
+              for(ListTodoHive tab in listTab)
+                tab.listTaskID == 'prioritize' ? Tab(icon: Icon(Icons.star_border)) : Tab(text: tab.listTaskName),
+              Tab(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add),
+                    SizedBox(width: 5),
+                    Text('Danh sách mới'),
+                  ],
+                )
+              )
             ],
+            onTap: (selectTab){
+              if(selectTab == listTab.length){
+                _showModalWork(context, ref);
+              }
+            },
           )
         ),
         body: TabBarView(
           children: [
-            ListPrioritizeTodo(),
-            ListTodo(),
-            Icon(Icons.directions_bike),
+            for(ListTodoHive tab in listTab)
+              if(tab.listTaskID == 'prioritize')
+                ListTodo()
+              else
+                ListTodo(tab.listTaskID)
+            ,
+            Container()
           ],
         ),
-
       ),
     );
   }
@@ -94,4 +126,68 @@ class ListTodo extends ConsumerWidget {
         loading: () => Center(child: CircularProgressIndicator.adaptive())
     );
   }
+}
+
+void _showModalWork(BuildContext context, WidgetRef ref) {
+  final TextEditingController nameController = TextEditingController();
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (BuildContext context) {
+
+      return Container(
+        padding: EdgeInsets.only(top: 16, left: 16, right: 16, bottom: MediaQuery.of(context).viewInsets.bottom + 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Thêm danh sách việc cần làm',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(
+                hintText: 'Nhập tên danh sách',
+              ),
+            ),
+            SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    _addListToDoTask(nameController.text, ref);
+                    Navigator.pop(context);
+                  },
+                  child: Text('Thêm'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+void _addListToDoTask(String name, WidgetRef ref) {
+  var uuid = Uuid();
+  var taskID = uuid.v4();
+  ListTodoHive listTodoHive = ListTodoHive(
+    listTaskID: taskID,
+    listTaskName: name
+  );
+  ref.read(listTodoNotifierProvider.notifier).addListTodo(listTodoHive);
 }
