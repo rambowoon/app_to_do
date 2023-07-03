@@ -59,10 +59,9 @@ class HomeScreen extends ConsumerWidget {
                 )
               )
             ],
+            isScrollable: true,
             onTap: (selectTab){
-              if(selectTab == listTab.length){
-                _showModalWork(context, ref);
-              }
+
             },
           )
         ),
@@ -70,11 +69,11 @@ class HomeScreen extends ConsumerWidget {
           children: [
             for(ListTodoHive tab in listTab)
               if(tab.listTaskID == 'prioritize')
-                ListTodo()
+                ListPrioritizeTodo()
               else
-                ListTodo(tab.listTaskID)
+                ListTodo(listTaskID: tab.listTaskID!)
             ,
-            Container()
+            ListTodoNew()
           ],
         ),
       ),
@@ -106,7 +105,8 @@ class ListPrioritizeTodo extends ConsumerWidget {
 }
 
 class ListTodo extends ConsumerWidget {
-  const ListTodo({Key? key}) : super(key: key);
+  final String listTaskID;
+  const ListTodo({Key? key, required this.listTaskID}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -128,66 +128,71 @@ class ListTodo extends ConsumerWidget {
   }
 }
 
-void _showModalWork(BuildContext context, WidgetRef ref) {
-  final TextEditingController nameController = TextEditingController();
+class ListTodoNew extends ConsumerWidget {
+  const ListTodoNew({Key? key}) : super(key: key);
 
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    builder: (BuildContext context) {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final TextEditingController nameController = TextEditingController();
 
-      return Container(
-        padding: EdgeInsets.only(top: 16, left: 16, right: 16, bottom: MediaQuery.of(context).viewInsets.bottom + 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-          ),
+    return Container(
+      padding: EdgeInsets.only(top: 16, left: 16, right: 16, bottom: MediaQuery.of(context).viewInsets.bottom + 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Thêm danh sách việc cần làm',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                hintText: 'Nhập tên danh sách',
-              ),
-            ),
-            SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    _addListToDoTask(nameController.text, ref);
-                    Navigator.pop(context);
-                  },
-                  child: Text('Thêm'),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: nameController,
+            decoration: InputDecoration(
+              hintText: 'Nhập tên danh sách',
+              border: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.grey, // Màu của border
+                  width: 1.0, // Độ dày của border
                 ),
-              ],
+                borderRadius: BorderRadius.circular(8), // Bo góc của border
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.blue, // Màu border khi TextField được focus
+                  width: 1.0,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-          ],
-        ),
-      );
-    },
-  );
+          ),
+          SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  _addListToDoTask(nameController.text, ref);
+                  nameController.dispose();
+                },
+                child: Text('Thêm'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
-void _addListToDoTask(String name, WidgetRef ref) {
+
+void _addListToDoTask(String name, WidgetRef ref) async {
   var uuid = Uuid();
   var taskID = uuid.v4();
   ListTodoHive listTodoHive = ListTodoHive(
     listTaskID: taskID,
     listTaskName: name
   );
-  ref.read(listTodoNotifierProvider.notifier).addListTodo(listTodoHive);
+  await ref.read(listTodoNotifierProvider.notifier).addListTodo(listTodoHive);
 }
