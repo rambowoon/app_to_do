@@ -44,7 +44,7 @@ class ToDoItem extends ConsumerWidget {
                       ),
                     ),
                     SizedBox(height: 5),
-                    Text(
+                    if(todo.taskNote != '') Text(
                       todo.taskNote!,
                       style: TextStyle(
                         color: Colors.grey,

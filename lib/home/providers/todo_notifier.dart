@@ -14,22 +14,8 @@ class TodoNotifier extends AsyncNotifier<List<TodoHive>>{
   }
 
   Future<List<TodoHive>> _getTodo() async {
-    final tabActive = ref.read(tabNotifierProvider);
     final List<TodoHive> todoList = await _todoBox.values.toList();
-    final List<TodoHive> result = [];
-    for(TodoHive todo in todoList){
-      if(todo.listTaskID == tabActive!){
-        result.add(todo);
-      }
-    }
-    return result;
-  }
-
-  Future<void> getTodoInList() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      return await _getTodo();
-    });
+    return todoList;
   }
 
   Future<void> addTodo(TodoHive todo) async {
@@ -48,7 +34,7 @@ class TodoNotifier extends AsyncNotifier<List<TodoHive>>{
       final existingItemIndex = todoItems.indexWhere((taskItem) => taskItem.taskID == taskID);
       if (existingItemIndex != -1) {
         final existingItem = todoItems[existingItemIndex];
-        _todoBox.delete(existingItem.key);
+        await _todoBox.delete(existingItem.key);
       }
       return _getTodo();
     });
@@ -62,7 +48,7 @@ class TodoNotifier extends AsyncNotifier<List<TodoHive>>{
       final existingItemIndex = todoItems.indexWhere((taskItem) => taskItem.taskID == taskID);
       if (existingItemIndex != -1) {
         final existingItem = todoItems[existingItemIndex];
-        _todoBox.putAt(existingItem.key, existingItem.copyWith(isPrioritize: isPrioritize));
+        await _todoBox.putAt(existingItem.key, existingItem.copyWith(isPrioritize: isPrioritize));
       }
       return _getTodo();
     });
@@ -78,15 +64,45 @@ class PrioritizeTodoNotifier extends AsyncNotifier<List<TodoHive>> {
   Future<List<TodoHive>> _getPrioritizeTodo() async {
     final List<TodoHive> listPrioritizeTodo = [];
     final listTodo = ref.watch(todoNotifierProvider).value;
-    print(listTodo);
 
     if(listTodo != null) {
-      for (var item in listTodo) {
+      for (TodoHive item in listTodo) {
         if (item.isPrioritize == true) {
+
           listPrioritizeTodo.add(item);
         }
       }
     }
     return await listPrioritizeTodo;
+  }
+}
+
+class TodoTabNotifier extends AsyncNotifier<List<TodoHive>>{
+  final Box<TodoHive> _todoBox = Hive.box<TodoHive>('todo');
+
+  @override
+  Future<List<TodoHive>> build() async {
+    return _getTodo();
+  }
+
+  Future<List<TodoHive>> _getTodo() async {
+    final tabActive = ref.read(tabNotifierProvider);
+    final listTodo = ref.watch(todoNotifierProvider).value;
+    final List<TodoHive> result = [];
+    if(listTodo != null) {
+      for(TodoHive todo in listTodo){
+        if(todo.listTaskID == tabActive!){
+          result.add(todo);
+        }
+      }
+    }
+    return await result;
+  }
+
+  Future<void> getTodoInList() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      return await _getTodo();
+    });
   }
 }

@@ -10,3 +10,7 @@ final todoNotifierProvider = AsyncNotifierProvider<TodoNotifier, List<TodoHive>>
 final todoPrioritizeNotifierProvider = AsyncNotifierProvider<PrioritizeTodoNotifier, List<TodoHive>>((){
   return PrioritizeTodoNotifier();
 });
+
+final todoTabNotifierProvider = AsyncNotifierProvider<TodoTabNotifier, List<TodoHive>>((){
+  return TodoTabNotifier();
+});

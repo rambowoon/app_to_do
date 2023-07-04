@@ -63,7 +63,7 @@ class HomeScreen extends ConsumerWidget {
             onTap: (selectTab){
               if(selectTab < listTab.length){
                 ref.read(tabNotifierProvider.notifier).changeTab(listTab[selectTab].listTaskID!);
-                ref.read(todoNotifierProvider.notifier).getTodoInList();
+                ref.read(todoTabNotifierProvider.notifier).getTodoInList();
               }
             },
           )
@@ -74,7 +74,7 @@ class HomeScreen extends ConsumerWidget {
               if(tab.listTaskID == 'prioritize')
                 ListPrioritizeTodo()
               else
-                ListTodo(listTaskID: tab.listTaskID!)
+                ListTodo()
             ,
             ListTodoNew()
           ],
@@ -101,19 +101,18 @@ class ListPrioritizeTodo extends ConsumerWidget {
               return ToDoItem(todo: todoItem);
             }
         ),
-        error: (err, stack) => Text('Lỗi rồi đại vương ơi'),
+        error: (err, stack) => Text('Lỗi rồi đại vương ơi !'),
         loading: () => Center(child: CircularProgressIndicator.adaptive())
     );
   }
 }
 
 class ListTodo extends ConsumerWidget {
-  final String listTaskID;
-  const ListTodo({Key? key, required this.listTaskID}) : super(key: key);
+  const ListTodo({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final todoList = ref.watch(todoNotifierProvider);
+    final todoList = ref.watch(todoTabNotifierProvider);
 
     return todoList.when(
         data: (todo) => ListView.builder(
@@ -125,7 +124,7 @@ class ListTodo extends ConsumerWidget {
             return ToDoItem(todo: todoItem);
           }
         ),
-        error: (err, stack) => Text('Lỗi rồi đại vương ơi'),
+        error: (err, stack) => Text('Lỗi rồi đại vương ơi..'),
         loading: () => Center(child: CircularProgressIndicator.adaptive())
     );
   }
