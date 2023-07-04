@@ -61,7 +61,10 @@ class HomeScreen extends ConsumerWidget {
             ],
             isScrollable: true,
             onTap: (selectTab){
-
+              if(selectTab < listTab.length){
+                ref.read(tabNotifierProvider.notifier).changeTab(listTab[selectTab].listTaskID!);
+                ref.read(todoNotifierProvider.notifier).getTodoInList();
+              }
             },
           )
         ),

@@ -3,17 +3,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
 
 import '../adapters/todo_hive.dart';
+import 'list_todo_provider.dart';
 
 class TodoNotifier extends AsyncNotifier<List<TodoHive>>{
   final Box<TodoHive> _todoBox = Hive.box<TodoHive>('todo');
+
   @override
   Future<List<TodoHive>> build() async {
     return _getTodo();
   }
 
   Future<List<TodoHive>> _getTodo() async {
+    final tabActive = ref.read(tabNotifierProvider);
     final List<TodoHive> todoList = await _todoBox.values.toList();
-    return todoList;
+    final List<TodoHive> result = [];
+    for(TodoHive todo in todoList){
+      if(todo.listTaskID == tabActive!){
+        result.add(todo);
+      }
+    }
+    return result;
+  }
+
+  Future<void> getTodoInList() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      return await _getTodo();
+    });
   }
 
   Future<void> addTodo(TodoHive todo) async {
@@ -62,6 +78,8 @@ class PrioritizeTodoNotifier extends AsyncNotifier<List<TodoHive>> {
   Future<List<TodoHive>> _getPrioritizeTodo() async {
     final List<TodoHive> listPrioritizeTodo = [];
     final listTodo = ref.watch(todoNotifierProvider).value;
+    print(listTodo);
+
     if(listTodo != null) {
       for (var item in listTodo) {
         if (item.isPrioritize == true) {

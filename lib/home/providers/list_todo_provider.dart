@@ -5,3 +5,7 @@ import 'list_todo_notifier.dart';
 final listTodoNotifierProvider = AsyncNotifierProvider<ListTodoNotifier, List<ListTodoHive>>((){
   return ListTodoNotifier();
 });
+
+final tabNotifierProvider = NotifierProvider<TabNotifier, String>((){
+  return TabNotifier();
+});

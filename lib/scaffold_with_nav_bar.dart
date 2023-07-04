@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import 'home/adapters/todo_hive.dart';
+import 'home/providers/list_todo_provider.dart';
 import 'home/providers/todo_provider.dart';
 
 class ScaffoldWithNavBar extends ConsumerWidget {
@@ -184,7 +185,8 @@ void _showBottomSheet(BuildContext context, WidgetRef ref) {
 
 void _addToDoTask(String name, String note, DateTime date, TimeOfDay time, WidgetRef ref) async {
   var uuid = Uuid();
-  var taskID = uuid.v4();
+  String taskID = uuid.v4();
+  String listTaskID = ref.read(tabNotifierProvider);
 
   DateTime combinedDateTime = DateTime(
     date.year,
@@ -206,7 +208,7 @@ void _addToDoTask(String name, String note, DateTime date, TimeOfDay time, Widge
   todo.endTime = dateTimePick;
   todo.isPrioritize = false;
   todo.isCompleted = false;
-  todo.listTaskID = taskID;
+  todo.listTaskID = listTaskID;
 
   await ref.read(todoNotifierProvider.notifier).addTodo(todo);
 }

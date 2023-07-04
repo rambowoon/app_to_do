@@ -4,6 +4,7 @@ import '../adapters/list_todo_hive.dart';
 
 class ListTodoNotifier extends AsyncNotifier<List<ListTodoHive>>{
   final Box<ListTodoHive> _todoBox = Hive.box<ListTodoHive>('list_todo');
+
   @override
   Future<List<ListTodoHive>> build() async {
     return _getListTodo();
@@ -12,6 +13,14 @@ class ListTodoNotifier extends AsyncNotifier<List<ListTodoHive>>{
   Future<List<ListTodoHive>> _getListTodo() async {
     final List<ListTodoHive> todoList = await _todoBox.values.toList();
     return todoList;
+  }
+
+  Future<void> loadTabListTodo(ListTodoHive todo) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await _todoBox.add(todo);
+      return _getListTodo();
+    });
   }
 
   Future<void> addListTodo(ListTodoHive todo) async {
@@ -34,5 +43,17 @@ class ListTodoNotifier extends AsyncNotifier<List<ListTodoHive>>{
       }
       return _getListTodo();
     });
+  }
+}
+
+class TabNotifier extends Notifier<String> {
+
+  @override
+  String build() {
+    state = 'mytask';
+    return state;
+  }
+  void changeTab(String listTaskID) {
+    state = listTaskID;
   }
 }
