@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../constants.dart';
 import '../adapters/todo_hive.dart';
 import '../providers/todo_provider.dart';
@@ -13,6 +14,7 @@ class ToDoItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    String statusTime =  getRemainingTime(todo.endTime!);
     return Column(
       children: [
         Container(
@@ -50,7 +52,9 @@ class ToDoItem extends ConsumerWidget {
                         color: Colors.grey,
                       ),
                     ),
+                    if(statusTime != "")
                     SizedBox(height: 2),
+                    if(statusTime != "")
                     TextButton(
                       onPressed: () {},
                       style: TextButton.styleFrom(
@@ -58,9 +62,10 @@ class ToDoItem extends ConsumerWidget {
                         minimumSize: Size(80, 25),
                         padding: EdgeInsets.all(5),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5), // Đặt giá trị radius tùy ý
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                        textStyle: TextStyle(fontSize: 11, color: Colors.deepPurple),
+                        textStyle: TextStyle(fontSize: 11, color: Colors
+                            .deepPurple),
                       ),
                       child: Text(getRemainingTime(todo.endTime!)),
                     )
@@ -122,9 +127,41 @@ void _showDeleteConfirmationDialog(BuildContext context,  WidgetRef ref, String 
 }
 
 String getRemainingTime(int timestamp) {
-  final now = DateTime.now();
-  final targetTime = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
-  final remainingDuration = targetTime.difference(now);
+  String status = "";
+  if(timestamp > 0){
+    int dateTimeNow = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    int remainingDuration = timestamp - dateTimeNow;
+    if(remainingDuration > 2592000 ){
+      int month = (remainingDuration ~/ 2592000);
+      status = "Còn $month tháng";
+    }else if(remainingDuration > 86400 ){
+      int day = (remainingDuration ~/ 86400);
+      status = "Còn $day ngày";
+    }else if(remainingDuration > 3600 ){
+      int hour = (remainingDuration ~/ 3600);
+      status = "Còn $hour giờ";
+    }else if(remainingDuration > 60 ){
+      int minute = (remainingDuration ~/ 60);
+      status = "Còn $minute phút";
+    }else if(remainingDuration > 0 ){
+      status = "Còn $remainingDuration giây";
+    }else if(remainingDuration < -2592000 ){
+      int month = (-remainingDuration ~/ 2592000);
+      status = "$month tháng trước";
+    }else if(remainingDuration < -86400 ){
+      int day = (-remainingDuration ~/ 86400);
+      status = "$day ngày trước";
+    }else if(remainingDuration < -3600 ){
+      int hour = (-remainingDuration ~/ 3600);
+      status = "$hour giờ trước";
+    }else if(remainingDuration < -60 ){
+      int minute = (-remainingDuration ~/ 60);
+      status = "$minute phút trước";
+    }else if(remainingDuration < 0 ){
+      int second = -remainingDuration;
+      status = "$second giây trước";
+    }
+  }
 
-  return timeago.format(now.subtract(remainingDuration));
+  return status;
 }

@@ -195,8 +195,10 @@ void _addToDoTask(String name, String note, DateTime date, TimeOfDay time, Widge
     time.hour,
     time.minute,
   );
-  int dateTimePick = combinedDateTime.millisecondsSinceEpoch;
-  int dateTimeNow = DateTime.now().millisecondsSinceEpoch;
+  int dateTimePick = combinedDateTime.millisecondsSinceEpoch ~/ 1000;
+  int dateTimeNow = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  print('dateTimePick $dateTimePick');
+  print('dateTimeNow $dateTimeNow');
   if(dateTimePick < dateTimeNow){
     dateTimePick = 0;
   }
