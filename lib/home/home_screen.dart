@@ -176,8 +176,28 @@ class ListTodoNew extends ConsumerWidget {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  _addListToDoTask(nameController.text, ref);
-                  nameController.dispose();
+                  if(nameController.text != ''){
+                    _addListToDoTask(nameController.text, ref);
+                    nameController.dispose();
+                  }else {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Thông báo'),
+                          content: Text("Vui lòng nhập tên danh sách"),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text('Ok'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
                 },
                 child: Text('Thêm'),
               ),

@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
 import '../adapters/list_todo_hive.dart';
+import 'list_todo_provider.dart';
+import 'todo_provider.dart';
 
 class ListTodoNotifier extends AsyncNotifier<List<ListTodoHive>>{
   final Box<ListTodoHive> _todoBox = Hive.box<ListTodoHive>('list_todo');
@@ -27,6 +29,8 @@ class ListTodoNotifier extends AsyncNotifier<List<ListTodoHive>>{
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await _todoBox.add(todo);
+      ref.read(tabNotifierProvider.notifier).changeTab(todo.listTaskID!);
+      ref.read(todoTabNotifierProvider.notifier).getTodoInList();
       return _getListTodo();
     });
   }
@@ -47,7 +51,6 @@ class ListTodoNotifier extends AsyncNotifier<List<ListTodoHive>>{
 }
 
 class TabNotifier extends Notifier<String> {
-
   @override
   String build() {
     state = 'mytask';

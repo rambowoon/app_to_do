@@ -169,8 +169,29 @@ void _showBottomSheet(BuildContext context, WidgetRef ref) {
                 ),
                 TextButton(
                   onPressed: () {
-                    _addToDoTask(nameController.text, noteController.text, selectedDate, selectedTime,  ref);
-                    Navigator.pop(context);
+                    if(nameController.text != '') {
+                      _addToDoTask(nameController.text, noteController.text,
+                          selectedDate, selectedTime, ref);
+                      Navigator.pop(context);
+                    }else{
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Thông báo'),
+                            content: Text("Vui lòng nhập tên công việc"),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('Ok'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
                   },
                   child: Text('Thêm'),
                 ),
