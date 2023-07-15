@@ -14,8 +14,27 @@ class TodoNotifier extends AsyncNotifier<List<TodoHive>>{
   }
 
   Future<List<TodoHive>> _getTodo() async {
-    final List<TodoHive> todoList = await _todoBox.values.toList();
-    return todoList;
+    final tabActive = ref.read(tabNotifierProvider);
+    final List<TodoHive> listTodo = await _todoBox.values.toList();
+    final List<TodoHive> result = [];
+    if(tabActive == 'prioritize') {
+      if(listTodo != null) {
+        for (TodoHive item in listTodo) {
+          if (item.isPrioritize == true) {
+            result.add(item);
+          }
+        }
+      }
+    }else{
+      if (listTodo != null) {
+        for (TodoHive todo in listTodo) {
+          if (todo.listTaskID == tabActive!) {
+            result.add(todo);
+          }
+        }
+      }
+    }
+    return await result;
   }
 
   Future<void> addTodo(TodoHive todo) async {
@@ -52,51 +71,6 @@ class TodoNotifier extends AsyncNotifier<List<TodoHive>>{
       }
       return _getTodo();
     });
-  }
-}
-
-class PrioritizeTodoNotifier extends AsyncNotifier<List<TodoHive>> {
-  @override
-  Future<List<TodoHive>> build() async {
-    return _getPrioritizeTodo();
-  }
-
-  Future<List<TodoHive>> _getPrioritizeTodo() async {
-    final List<TodoHive> listPrioritizeTodo = [];
-    final listTodo = ref.watch(todoNotifierProvider).value;
-
-    if(listTodo != null) {
-      for (TodoHive item in listTodo) {
-        if (item.isPrioritize == true) {
-
-          listPrioritizeTodo.add(item);
-        }
-      }
-    }
-    return await listPrioritizeTodo;
-  }
-}
-
-class TodoTabNotifier extends AsyncNotifier<List<TodoHive>>{
-  final Box<TodoHive> _todoBox = Hive.box<TodoHive>('todo');
-
-  @override
-  Future<List<TodoHive>> build() async {
-    return _getTodo();
-  }
-
-  Future<List<TodoHive>> _getTodo() async {
-    final tabActive = ref.read(tabNotifierProvider);
-    final listTodo = ref.watch(todoNotifierProvider).value;
-    final List<TodoHive> result = [];
-    if(listTodo != null) {
-      for(TodoHive todo in listTodo){
-        if(todo.listTaskID == tabActive!){
-          result.add(todo);
-        }
-      }
-    }
-    return await result;
   }
 
   Future<void> getTodoInList() async {

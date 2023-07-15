@@ -63,7 +63,7 @@ class HomeScreen extends ConsumerWidget {
             onTap: (selectTab){
               if(selectTab < listTab.length){
                 ref.read(tabNotifierProvider.notifier).changeTab(listTab[selectTab].listTaskID!);
-                ref.read(todoTabNotifierProvider.notifier).getTodoInList();
+                ref.read(todoNotifierProvider.notifier).getTodoInList();
               }
             },
           )
@@ -71,9 +71,6 @@ class HomeScreen extends ConsumerWidget {
         body: TabBarView(
           children: [
             for(ListTodoHive tab in listTab)
-              if(tab.listTaskID == 'prioritize')
-                ListPrioritizeTodo()
-              else
                 ListTodo()
             ,
             ListTodoNew()
@@ -84,35 +81,12 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-class ListPrioritizeTodo extends ConsumerWidget {
-  const ListPrioritizeTodo({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final todoList = ref.watch(todoPrioritizeNotifierProvider);
-
-    return todoList.when(
-        data: (todo) => ListView.builder(
-            shrinkWrap: true,
-            itemCount: todo?.length,
-            padding: EdgeInsets.only(top: 20, bottom: 20, left: 10, right: 10),
-            itemBuilder: (BuildContext context, int index) {
-              final TodoHive todoItem = todo![index];
-              return ToDoItem(todo: todoItem);
-            }
-        ),
-        error: (err, stack) => Text('Lỗi rồi đại vương ơi !'),
-        loading: () => Center(child: CircularProgressIndicator.adaptive())
-    );
-  }
-}
-
 class ListTodo extends ConsumerWidget {
   const ListTodo({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final todoList = ref.watch(todoTabNotifierProvider);
+    final todoList = ref.watch(todoNotifierProvider);
 
     return todoList.when(
         data: (todo) => ListView.builder(

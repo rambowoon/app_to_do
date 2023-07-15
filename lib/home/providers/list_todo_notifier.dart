@@ -30,7 +30,7 @@ class ListTodoNotifier extends AsyncNotifier<List<ListTodoHive>>{
     state = await AsyncValue.guard(() async {
       await _todoBox.add(todo);
       ref.read(tabNotifierProvider.notifier).changeTab(todo.listTaskID!);
-      ref.read(todoTabNotifierProvider.notifier).getTodoInList();
+      ref.read(todoNotifierProvider.notifier).getTodoInList();
       return _getListTodo();
     });
   }
